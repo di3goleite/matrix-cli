@@ -53,7 +53,7 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
   var configFile = fs.readFileSync(pwd + detectFile).toString();
   var configObject = {};
   var policyObject = {};
-  var appVersion;
+  var appVersion, iconUrl;
 
   try {
     var config = yaml.safeLoad(fs.readFileSync(pwd + detectFile));
@@ -93,52 +93,64 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
       return console.error(err.message.red);
     }
 
-    console.log(t('matrix.deploy.reading') + ' ', pwd);
-    console.log(t('matrix.deploy.writing') + ' ', destinationFilePath);
+    //TODO check for icon and generate assets folder
+    if (config.hasOwnProperty('icon')) {
 
-    var destinationZip = fs.createWriteStream(destinationFilePath);
+      //TODO: Upload image to bucket
+      //TODO: Put URL on assets
+      iconUrl = 'https://www.visualnews.com/wp-content/uploads/2012/07/flixel-app-icon1.png'; 
 
-    destinationZip.on('open', function () {
-      debug('deploy zip start')
-    });
+      console.log(t('matrix.deploy.reading') + ' ', pwd);
+      console.log(t('matrix.deploy.writing') + ' ', destinationFilePath);
 
-    destinationZip.on('error', function (err) {
-      debug('deploy zip err', err)
-    });
+      var destinationZip = fs.createWriteStream(destinationFilePath);
 
-    destinationZip.on('finish', function () {
-      debug('deploy zip finish');
-      onEnd();
-    });
+      destinationZip.on('open', function () {
+        debug('deploy zip start')
+      });
 
-    // zip up the files in the app directory
-    var archiver = require('archiver');
-    var zip = archiver.create('zip', {});
+      destinationZip.on('error', function (err) {
+        debug('deploy zip err', err)
+      });
 
-    // zip.bulk([{
-    //   expand: true,
-    //   cwd: pwd
-    // }, ]);
+      destinationZip.on('finish', function () {
+        debug('deploy zip finish');
+        onEnd();
+      });
+
+      // zip up the files in the app directory
+      var archiver = require('archiver');
+      var zip = archiver.create('zip', {});
+
+      // zip.bulk([{
+      //   expand: true,
+      //   cwd: pwd
+      // }, ]);
 
 
-    var files = fs.readdirSync(pwd);
-    _.each(files, function (file) {
-      debug('Adding to zip', file)
-      //TODO need to properly validate filenames
-      if (_.isEmpty(file) || _.isUndefined(file) || file == ':') {
-        console.warn('Skipping invalid file: '.red, file);
-      } else {
-        zip.append(fs.createReadStream(pwd + file), {
-          name: file
-        });
-      }
-    });
+      var files = fs.readdirSync(pwd);
+      _.each(files, function (file) {
+        debug('Adding to zip', file)
+        //TODO need to properly validate filenames
+        if (_.isEmpty(file) || _.isUndefined(file) || file == ':') {
+          console.warn('Skipping invalid file: '.red, file);
+        } else {
+          zip.append(fs.createReadStream(pwd + file), {
+            name: file
+          });
+        }
+      });
 
-    zip.on('error', function (err) {
-      console.error(t('matrix.deploy.error') + ':', err)
-    });
-    zip.finalize();
-    zip.pipe(destinationZip); // send zip to the file
+      zip.on('error', function (err) {
+        console.error(t('matrix.deploy.error') + ':', err)
+      });
+      zip.finalize();
+      zip.pipe(destinationZip); // send zip to the file
+
+    } else {
+      return console.error('Missing icon in config, all apps must provide an icon!'.red);
+    }
+
   });
 
   function onEnd() {
@@ -183,6 +195,9 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
                           'name': appName,
                           'version': appVersion,
                           'file': downloadURL
+                        },
+                        'assets': {
+                          icon: iconUrl
                         },
                         'config': configObject,
                         'policy': policyObject
