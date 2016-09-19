@@ -6,7 +6,7 @@ var prompt = require('prompt');
 var p = require('child_process');
 
 Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function () {
-  
+
   if (!Matrix.pkgs.length || showTheHelp) {
     return displayHelp();
   }
@@ -39,7 +39,7 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
         if (err.toString().indexOf('canceled') > 0) {
           console.log('');
           process.exit();
-        } else { 
+        } else {
           console.log("Error: ", err);
           process.exit();
         }
@@ -48,7 +48,7 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
       // check for dupe name, note, this requires matrix list devices to have run
 
       _.each(Matrix.config.deviceMap, function (d) {
-        if (inputs.name === d.name) {   
+        if (inputs.name === d.name) {
           console.error(d.name, ' ' + t('matrix.sim.init.device_is_already_used'));
           process.exit();
         }
@@ -61,7 +61,10 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
         version: require(__dirname + '/../package.json').version,
         name: inputs.name,
         description: inputs.description,
-        hardwareId: deviceId
+        hardwareId: deviceId,
+        retrieve: {
+          finished: ['deviceId']
+        }
       };
 
       Matrix.firebaseInit(function () {
@@ -69,22 +72,35 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
 
         var events = {
           error: function (err) {
-            console.log('Error creating device '.red + deviceObj.name.yellow + ': '.red, err);
-            process.exit();
+            if (err.hasOwnProperty('state') && err.state == 'device-provisioning-in-progress') {
+              console.log('Provisioning... '.yellow + deviceObj.name.yellow + ': ');
+            } else { 
+              console.log('Error creating device '.red + deviceObj.name.yellow + ': '.red, err);
+              process.exit(); 
+            }
           },
-          finished: function () {
-            console.log('Device registered succesfuly');
+          finished: function (params) {
+            debug('Params: ', params);
+            if (params.hasOwnProperty('deviceId')) {
+            console.log('Device registered succesfuly');  
+            } else {
+              console.log('ERROR', err);
+            }
+            
 
             Matrix.config.sim = {
               token: Matrix.config.user.token,
               id: deviceId
             }
 
-            Matrix.helpers.saveConfig(function () { 
+            Matrix.helpers.saveConfig(function () {
               console.log(t('matrix.sim.init.success').green)
               console.log('\n' + t('matrix.sim.init.to_target_device') + ':\n');
-              console.log('matrix use %s'.grey, Matrix.config.sim.id, '\n');
-              process.exit();
+
+              //console.log('este>>>>>', Matrix.config,'<<<<<<<')
+              console.log('matrix use %s'.grey, params.deviceId, '\n');
+              process.exit(0);
+
             });
           },
           start: function () {
@@ -94,8 +110,10 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
             console.log('Registering device...');
           }
         };
+          //console.log('BRAYAN',Matrix.firebase.device.add);  
 
         Matrix.firebase.device.add(deviceObj, events);
+        
       });
 
       /*
@@ -123,7 +141,7 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
         });
       });*/
     });
-    
+
   } else if (cmd === 'start') {
     var option = Matrix.pkgs[1];
 
@@ -135,7 +153,7 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
     }
 
     if (Matrix.config.sim.custom === true) {
-      console.log( t('matrix.sim.start.custom_image_detected').grey + '...'.grey)
+      console.log(t('matrix.sim.start.custom_image_detected').grey + '...'.grey)
     }
 
     if (option === 'debug') {
@@ -192,14 +210,14 @@ Matrix.localization.init(Matrix.localesFolder, Matrix.config.locale, function ()
     })
 
     proc.stdout.on('data', function (data) {
-      console.log('stdout',data);
+      console.log('stdout', data);
     })
 
-  if ( Matrix.config.hasOwnProperty('sim')) {
-    Matrix.config.sim.custom = false;
-  }
+    if (Matrix.config.hasOwnProperty('sim')) {
+      Matrix.config.sim.custom = false;
+    }
 
-  Matrix.helpers.saveConfig();
+    Matrix.helpers.saveConfig();
 
     //matrix sim save
   } else if (cmd === 'save') {
