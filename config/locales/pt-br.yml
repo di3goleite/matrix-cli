@@ -7,33 +7,33 @@ pt-br:
     no_user_message: Nenhum usuário foi selecionado
     device_title: Dispositivo
     locale_title: Localização
-    help_login: Login to the MatrixOS platform
-    help_register: Create a MatrixOS platform user
-    help_logout: Log out of the MatrixOS platform
-    help_use: Indicate active device
-    help_set: 'Set environment settings, update application configuration, change cli locale'
-    help_sim: Manage local MatrixOS simulator with Docker
-    help_list: 'Information about your devices, applications and installs'
-    help_reboot: Reboots the active MatrixOS device
-    help_search: Search for apps
-    help_install: Install an app or sensor to active MatrixOS device
-    help_install_default: defaults to app
-    help_config: View and modify application configuration
-    help_uninstall: Uninstall the app
-    help_update: Update to a specified version of a MatrixOS application
-    help_start: Starts an app running on the active MatrixOS
-    help_stop: Stops an app running on the active MatrixOS
-    help_restart: Restarts an app running on the MatrixOS
-    help_create: Creates a new scaffolding for a MatrixOS Application
-    help_deploy: Uploads and deploys an app to the active MatrixOS
-    help_trigger: Runs a trigger test
-    help_log: Logs output from selected MatrixOS and applications
-    please_login: No user logged in.
-    expired: Expired session > `matrix login`
-    set_device: No Device Set. Use # `matrix use`
+    help_login: Login na plataforma MatrixOS
+    help_register: Criar um usuário da plataforma MatrixOS
+    help_logout: Log out da plataforma MatrixOS
+    help_use: Indicar o dispositivo ativo
+    help_set: 'Configurar ambiente, atualizar configuração da aplicação, mudar localização da cli'
+    help_sim: Gerenciar o simulador local do MatrixOS com Docker
+    help_list: 'Informações sobre seus dispositivos, aplicações e instalações'
+    help_reboot: Reinicia o dispositivo MatrixOS ativo
+    help_search: Busca por apps
+    help_install: Instalar um app ou sensor ao dispositivo MatrixOS ativo
+    help_install_default: default do app
+    help_config: Visualizar e modificar configuração da aplicação
+    help_uninstall: Desinstalar o app
+    help_update: Atualizar para uma versão específica de uma aplicação do MatrixOS
+    help_start: Inicia um app que está executando no MatrixOS ativo
+    help_stop: Para um app que está executando no MatrixOS ativo
+    help_restart: Reinicia um app que está executando no MatrixOS ativo
+    help_create: Cria um novo esqueleto para uma aplicação do MatrixOS
+    help_deploy: Implantação e carregamento de um app para o MatrixOS ativo
+    help_trigger: Executa um trigger test
+    help_log: Log da saída de um MatrixOS e suas aplicações
+    please_login: Nenhum usuário logado.
+    expired: Sessão Finalizada > `matrix login`
+    set_device: Nenhum dispositivo em uso. Use # `matrix use`
     validate:
-      no_device: No Device Selected
-      select_device_id: select a device id'
+      no_device: Nenhum dispositivo selecionado
+      select_device_id: selecione o id de um dispositivo'
     #SETUP:
     login:
       already_login_warning: 'there is already a registered account' #
